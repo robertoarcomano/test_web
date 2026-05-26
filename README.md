@@ -568,8 +568,77 @@ Current planning lives in GitHub issues and is organized around a controlled go-
 - Full legacy migration and irreversible shutdown of MATRIX 1.x.
 
 
+## Database ER diagram
+
 ```mermaid
 erDiagram
+
+    audit_log {
+        uuid id PK
+        varchar entityType
+        uuid entityId
+        varchar entityLabel
+        uuid actorId
+        varchar actorEmail
+        varchar action
+        jsonb meta
+        timestamp createdAt
+    }
+
+    comment_threads {
+        uuid id PK
+        varchar targetType
+        varchar targetId
+        varchar title
+        varchar status
+        uuid createdById FK
+        timestamp createdAt
+        timestamp updatedAt
+    }
+
+    comments {
+        uuid id PK
+        uuid threadId FK
+        uuid authorId FK
+        text body
+        jsonb mentionedUserIds
+        timestamp createdAt
+        timestamp updatedAt
+    }
+
+    module_definitions {
+        uuid id PK
+        varchar slug
+        varchar moduleType
+        varchar version
+        int schemaVersion
+        varchar title
+        text description
+        jsonb layout
+        jsonb permissions
+        varchar status
+        timestamp createdAt
+        timestamp updatedAt
+        jsonb approvalChain
+    }
+
+    module_instances {
+        uuid id PK
+        uuid projectId
+        uuid moduleDefinitionId FK
+        int schemaVersion
+        jsonb data
+        varchar status
+        jsonb auditLog
+        timestamp createdAt
+        timestamp updatedAt
+        int approvalStep
+        bytea yjsState
+    }
+
+    module_types {
+        varchar name PK
+        varchar label
         text description
         varchar icon
         boolean supports_realtime
